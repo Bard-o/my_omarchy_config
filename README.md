@@ -11,6 +11,8 @@ Omarchy comes out of the box with a polished, efficient desktop environment. But
 ### 🎬 Video Wallpapers
 Animated wallpaper support for Omarchy using mpvpaper and swww.
 
+https://github.com/user-attachments/assets/bb87573b-edbd-456b-b81d-d50e9cd808fe
+
 [Learn more →](video-wallpaper/)
 
 ## Credits
