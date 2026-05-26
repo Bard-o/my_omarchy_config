@@ -1,0 +1,66 @@
+#!/bin/bash
+
+# omarchy:summary=Set the current background image
+# omarchy:args=<path-to-image>
+# omarchy:examples=omarchy theme bg set ~/Pictures/wallpaper.png
+
+if [[ -z $1 ]]; then
+  echo "Usage: omarchy-theme-bg-set <path-to-image>" >&2
+  exit 1
+fi
+
+BACKGROUND="$(realpath "$1")"
+CURRENT_BACKGROUND_LINK="$HOME/.config/omarchy/current/background"
+STATE_FILE="$HOME/.config/omarchy/current/video-wallpaper.state"
+LAST_STATIC_FILE="$HOME/.config/omarchy/current/last-static-bg"
+LAST_VIDEO_FILE="$HOME/.config/omarchy/current/last-video-bg"
+
+if [[ ! -f "$BACKGROUND" ]]; then
+  echo "File does not exist: $BACKGROUND" >&2
+  exit 1
+fi
+
+# Create symlink to the new background
+ln -nsf "$BACKGROUND" "$CURRENT_BACKGROUND_LINK"
+
+# Kill existing wallpaper processes
+pkill -x swaybg 2>/dev/null
+pkill -x mpvpaper-rs 2>/dev/null
+pkill -x mpvpaper 2>/dev/null
+
+# Check if it's a video file
+EXT="${BACKGROUND##*.}"
+EXT="${EXT,,}"
+
+VIDEO_EXTENSIONS="mp4 mkv webm avi mov wmv flv ogm"
+GIF_EXTENSIONS="gif"
+
+IS_VIDEO=0
+IS_GIF=0
+
+for vext in $VIDEO_EXTENSIONS; do
+  if [[ "$EXT" == "$vext" ]]; then
+    IS_VIDEO=1
+    break
+  fi
+done
+
+for gext in $GIF_EXTENSIONS; do
+  if [[ "$EXT" == "$gext" ]]; then
+    IS_GIF=1
+    break
+  fi
+done
+
+if [[ $IS_VIDEO -eq 1 ]]; then
+  echo "video" > "$STATE_FILE"
+  echo "$BACKGROUND" > "$LAST_VIDEO_FILE"
+  setsid mpvpaper-rs -f ALL "$BACKGROUND" >/dev/null 2>&1 &
+elif [[ $IS_GIF -eq 1 ]]; then
+  echo "gif" > "$STATE_FILE"
+  setsid swww img "$BACKGROUND" --transition-type fade --transition-duration 1.0 >/dev/null 2>&1 &
+else
+  echo "image" > "$STATE_FILE"
+  echo "$BACKGROUND" > "$LAST_STATIC_FILE"
+  setsid uwsm-app -- swaybg -i "$CURRENT_BACKGROUND_LINK" -m fill >/dev/null 2>&1 &
+fi

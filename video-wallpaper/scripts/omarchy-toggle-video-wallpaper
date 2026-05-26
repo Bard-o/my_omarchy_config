@@ -1,0 +1,156 @@
+#!/bin/bash
+
+# omarchy:summary=Toggle between static and video wallpaper
+# Options: --restore-on-boot to restore wallpaper from saved state
+
+STATE_FILE="$HOME/.config/omarchy/current/video-wallpaper.state"
+LAST_STATIC_FILE="$HOME/.config/omarchy/current/last-static-bg"
+LAST_VIDEO_FILE="$HOME/.config/omarchy/current/last-video-bg"
+CURRENT_BACKGROUND_LINK="$HOME/.config/omarchy/current/background"
+CURRENT_BG=$(readlink "$CURRENT_BACKGROUND_LINK" 2>/dev/null)
+
+if [[ "$1" == "--restore-on-boot" ]]; then
+  pkill -x swaybg 2>/dev/null
+  pkill -x mpvpaper-rs 2>/dev/null
+  pkill -x mpvpaper 2>/dev/null
+  pkill -x swww-daemon 2>/dev/null
+
+  if [[ -f "$STATE_FILE" ]]; then
+    CURRENT_STATE=$(cat "$STATE_FILE")
+    if [[ "$CURRENT_STATE" == "video" && -n "$CURRENT_BG" && -f "$CURRENT_BG" ]]; then
+      setsid mpvpaper-rs -f ALL "$CURRENT_BG" >/dev/null 2>&1 &
+      exit 0
+    elif [[ "$CURRENT_STATE" == "gif" && -n "$CURRENT_BG" && -f "$CURRENT_BG" ]]; then
+      setsid swww img "$CURRENT_BG" --transition-type none >/dev/null 2>&one &
+      exit 0
+    fi
+  fi
+
+  if [[ -n "$CURRENT_BG" && -f "$CURRENT_BG" ]]; then
+    EXT="${CURRENT_BG##*.}"
+    EXT="${EXT,,}"
+    VIDEO_EXTENSIONS="mp4 mkv webm avi mov wmv flv ogm"
+    IS_VIDEO=0
+    for vext in $VIDEO_EXTENSIONS; do
+      if [[ "$EXT" == "$vext" ]]; then
+        IS_VIDEO=1
+        break
+      fi
+    done
+    if [[ $IS_VIDEO -eq 1 ]]; then
+      setsid mpvpaper-rs -f ALL "$CURRENT_BG" >/dev/null 2>&1 &
+    else
+      setsid uwsm-app -- swaybg -i "$CURRENT_BG" -m fill >/dev/null 2>&1 &
+    fi
+  fi
+  exit 0
+fi
+
+THEME_NAME=$(cat "$HOME/.config/omarchy/current/theme.name" 2>/dev/null)
+
+if [[ -f "$STATE_FILE" ]]; then
+  CURRENT_STATE=$(cat "$STATE_FILE")
+else
+  CURRENT_STATE="image"
+fi
+
+pkill -x swaybg 2>/dev/null
+pkill -x mpvpaper-rs 2>/dev/null
+pkill -x mpvpaper 2>/dev/null
+pkill -x swww-daemon 2>/dev/null
+
+if [[ "$CURRENT_STATE" == "video" ]]; then
+  # Switch to static image
+  STATIC_BG=""
+
+  # Priority 1: Use last used static image if it still exists
+  if [[ -f "$LAST_STATIC_FILE" ]]; then
+    SAVED_STATIC=$(cat "$LAST_STATIC_FILE")
+    if [[ -f "$SAVED_STATIC" ]]; then
+      STATIC_BG="$SAVED_STATIC"
+    fi
+  fi
+
+  # Priority 2: Find first available if last used doesn't exist
+  if [[ -z "$STATIC_BG" ]]; then
+    for dir in "$HOME/.config/omarchy/current/theme/backgrounds/" \
+               "$HOME/.config/omarchy/backgrounds/$THEME_NAME/" \
+               "$HOME/.config/omarchy/themes/$THEME_NAME/backgrounds/"; do
+      if [[ -d "$dir" ]]; then
+        FIRST_IMAGE=$(find -L "$dir" -maxdepth 1 \( -type f \) \( -name "*.jpg" -o -name "*.jpeg" -o -name "*.png" -o -name "*.webp" \) 2>/dev/null | sort | head -1)
+        if [[ -n "$FIRST_IMAGE" ]]; then
+          STATIC_BG="$FIRST_IMAGE"
+          break
+        fi
+      fi
+    done
+  fi
+
+  if [[ -n "$STATIC_BG" ]]; then
+    ln -nsf "$STATIC_BG" "$CURRENT_BACKGROUND_LINK"
+    echo "image" > "$STATE_FILE"
+    echo "$STATIC_BG" > "$LAST_STATIC_FILE"
+    setsid uwsm-app -- swaybg -i "$STATIC_BG" -m fill >/dev/null 2>&1 &
+    notify-send "Wallpaper" "Switched to static image" -t 2000
+  else
+    pkill -x swaybg 2>/dev/null
+    pkill -x mpvpaper-rs 2>/dev/null
+    setsid uwsm-app -- swaybg --color '#000000' >/dev/null 2>&1 &
+    echo "image" > "$STATE_FILE"
+    notify-send "Wallpaper" "Switched to solid color" -t 2000
+  fi
+else
+  # Switch to video
+  THEME_VIDEOS_PATH="$HOME/.config/omarchy/themes/$THEME_NAME/videos/"
+
+  mapfile -d '' -t VIDEOS < <(find -L "$THEME_VIDEOS_PATH" -maxdepth 1 -type f \( -name "*.mp4" -o -name "*.mkv" -o -name "*.webm" -o -name "*.avi" -o -name "*.mov" \) -print0 2>/dev/null | sort -z)
+
+  if [[ ${#VIDEOS[@]} -eq 0 ]]; then
+    notify-send "No video wallpapers found" "Add videos to ~/.config/omarchy/themes/$THEME_NAME/videos/" -t 3000
+    exit 1
+  fi
+
+  VIDEO=""
+  NEXT_VIDEO=""
+
+  # Find current video index to cycle to next
+  CURRENT_INDEX=-1
+  for i in "${!VIDEOS[@]}"; do
+    if [[ "${VIDEOS[$i]}" == "$CURRENT_BG" ]]; then
+      CURRENT_INDEX=$i
+      break
+    fi
+  done
+
+  # Calculate next video (cycle through)
+  NEXT_INDEX=0
+  if [[ $CURRENT_INDEX -ge 0 ]]; then
+    NEXT_INDEX=$(((CURRENT_INDEX + 1) % ${#VIDEOS[@]}))
+  fi
+  NEXT_VIDEO="${VIDEOS[$NEXT_INDEX]}"
+
+  # Use last used video if it exists and is different from next
+  if [[ -f "$LAST_VIDEO_FILE" ]]; then
+    SAVED_VIDEO=$(cat "$LAST_VIDEO_FILE")
+    # Check if saved video is in our list
+    for v in "${VIDEOS[@]}"; do
+      if [[ "$v" == "$SAVED_VIDEO" ]]; then
+        VIDEO="$SAVED_VIDEO"
+        break
+      fi
+    done
+  fi
+
+  # Fallback to next in cycle
+  if [[ -z "$VIDEO" ]]; then
+    VIDEO="$NEXT_VIDEO"
+  fi
+
+  ln -nsf "$VIDEO" "$CURRENT_BACKGROUND_LINK"
+  echo "video" > "$STATE_FILE"
+  echo "$VIDEO" > "$LAST_VIDEO_FILE"
+
+  setsid mpvpaper-rs -f ALL "$VIDEO" >/dev/null 2>&1 &
+
+  notify-send "Video Wallpaper" "$(basename "$VIDEO")" -t 2000
+fi

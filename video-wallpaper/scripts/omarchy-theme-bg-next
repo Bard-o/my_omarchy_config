@@ -1,0 +1,98 @@
+#!/bin/bash
+
+# omarchy:summary=Cycle to the next background for the current theme
+# omarchy:examples=omarchy theme bg next
+
+THEME_NAME=$(cat "$HOME/.config/omarchy/current/theme.name" 2>/dev/null)
+CURRENT_BACKGROUND_LINK="$HOME/.config/omarchy/current/background"
+STATE_FILE="$HOME/.config/omarchy/current/video-wallpaper.state"
+LAST_STATIC_FILE="$HOME/.config/omarchy/current/last-static-bg"
+LAST_VIDEO_FILE="$HOME/.config/omarchy/current/last-video-bg"
+
+set_wallpaper() {
+  local FILE="$1"
+
+  ln -nsf "$FILE" "$CURRENT_BACKGROUND_LINK"
+
+  pkill -x swaybg 2>/dev/null
+  pkill -x mpvpaper-rs 2>/dev/null
+  pkill -x mpvpaper 2>/dev/null
+  pkill -x swww-daemon 2>/dev/null
+
+  EXT="${FILE##*.}"
+  EXT="${EXT,,}"
+
+  VIDEO_EXTENSIONS="mp4 mkv webm avi mov wmv flv ogm"
+  GIF_EXTENSIONS="gif"
+
+  IS_VIDEO=0
+  IS_GIF=0
+
+  for vext in $VIDEO_EXTENSIONS; do
+    if [[ "$EXT" == "$vext" ]]; then
+      IS_VIDEO=1
+      break
+    fi
+  done
+
+  for gext in $GIF_EXTENSIONS; do
+    if [[ "$EXT" == "$gext" ]]; then
+      IS_GIF=1
+      break
+    fi
+  done
+
+  if [[ $IS_VIDEO -eq 1 ]]; then
+    echo "video" > "$STATE_FILE"
+    echo "$FILE" > "$LAST_VIDEO_FILE"
+    setsid mpvpaper-rs -f ALL "$FILE" >/dev/null 2>&1 &
+  elif [[ $IS_GIF -eq 1 ]]; then
+    echo "gif" > "$STATE_FILE"
+    setsid swww img "$FILE" --transition-type fade --transition-duration 1.0 >/dev/null 2>&1 &
+  else
+    echo "image" > "$STATE_FILE"
+    echo "$FILE" > "$LAST_STATIC_FILE"
+    setsid uwsm-app -- swaybg -i "$FILE" -m fill >/dev/null 2>&1 &
+  fi
+}
+
+THEME_BACKGROUNDS_PATH="$HOME/.config/omarchy/current/theme/backgrounds/"
+USER_BACKGROUNDS_PATH="$HOME/.config/omarchy/backgrounds/$THEME_NAME/"
+THEME_VIDEOS_PATH="$HOME/.config/omarchy/themes/$THEME_NAME/videos/"
+USER_THEME_BG_PATH="$HOME/.config/omarchy/themes/$THEME_NAME/backgrounds/"
+
+mapfile -d '' -t BACKGROUNDS < <(find -L "$USER_BACKGROUNDS_PATH" "$THEME_BACKGROUNDS_PATH" "$USER_THEME_BG_PATH" "$THEME_VIDEOS_PATH" -maxdepth 1 \( -type f -o -type l \) -print0 2>/dev/null | sort -z)
+TOTAL=${#BACKGROUNDS[@]}
+
+if (( TOTAL == 0 )); then
+  notify-send "No background was found for theme" -t 2000
+  pkill -x swaybg 2>/dev/null
+  pkill -x mpvpaper-rs 2>/dev/null
+  pkill -x mpvpaper 2>/dev/null
+  pkill -x swww-daemon 2>/dev/null
+  echo "image" > "$STATE_FILE"
+  setsid uwsm-app -- swaybg --color '#000000' >/dev/null 2>&1 &
+else
+  if [[ -L $CURRENT_BACKGROUND_LINK ]]; then
+    CURRENT_BACKGROUND=$(readlink "$CURRENT_BACKGROUND_LINK")
+  else
+    CURRENT_BACKGROUND=""
+  fi
+
+  INDEX=-1
+  for i in "${!BACKGROUNDS[@]}"; do
+    if [[ "${BACKGROUNDS[$i]}" == "$CURRENT_BACKGROUND" ]]; then
+      INDEX=$i
+      break
+    fi
+  done
+
+  if (( INDEX == -1 )); then
+    NEW_BACKGROUND="${BACKGROUNDS[0]}"
+  else
+    NEXT_INDEX=$(((INDEX + 1) % TOTAL))
+    NEW_BACKGROUND="${BACKGROUNDS[$NEXT_INDEX]}"
+  fi
+
+  set_wallpaper "$NEW_BACKGROUND"
+fi

@@ -1,0 +1,26 @@
+# OS files
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.backup
+*~
+
+# Log files
+*.log
+
+# Editor files
+*.swp
+*.swo
+*~
+.#*
+
+# Build artifacts
+*.o
+*.so
+*.a
+target/
+
+# Temporary files
+tmp/
+temp/
