@@ -2,15 +2,18 @@
 
 Animated wallpaper support for Omarchy with video loop, audio mute, and toggle hotkey.
 
+Demo:
+https://github.com/user-attachments/assets/5dd8f3f4-8fff-4326-bc1b-c6b13ccfabf3
+
 ## Features
 
-- 🎬 MP4, MKV, WebM video support
-- 🔁 Infinite loop
-- 🔇 Audio muted by default
-- ⌨️ Toggle with `SUPER + SHIFT + W`
-- 📁 Per-theme video folders
-- 💾 Remembers last used wallpaper
-- 🖼️ Also supports static images and animated GIFs
+- MP4, MKV, WebM video support
+- Infinite loop
+- Audio muted by default
+- Toggle with `SUPER + SHIFT + W`
+- Per-theme video folders
+- Remembers last used wallpaper
+- Also supports static images and animated GIFs
 
 ## Installation
 
