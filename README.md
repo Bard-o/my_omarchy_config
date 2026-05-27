@@ -19,7 +19,7 @@ https://github.com/user-attachments/assets/bb87573b-edbd-456b-b81d-d50e9cd808fe
 
 Built with:
 - [mpvpaper-rs](https://github.com/BitYoungjae/mpvpaper-rs) - Video wallpaper player
-- [swww](https://github.com/LBCrion/swww) - Animated GIF wallpaper
+- [swww](https://github.com/LGFae/swww) - Animated GIF wallpaper
 - [mpv](https://mpv.io/) - Media player
 - [Omarchy](https://omarchy.org) - Base system
 

@@ -32,7 +32,7 @@ chmod +x install.sh
 The following tools are required and will be installed:
 
 - [mpvpaper-rs](https://github.com/BitYoungjae/mpvpaper-rs) - Video wallpaper player
-- [swww](https://github.com/LBCrion/swww) - Animated GIF wallpaper daemon
+- [swww](https://github.com/LGFae/swww) - Animated GIF wallpaper daemon
 - [mpv](https://mpv.io/) - Media player (usually pre-installed)
 - [elephant](https://github.com/pystardust/eleFant) - Menu system for Omarchy
 
@@ -115,5 +115,5 @@ License: MIT
 
 Tools used:
 - [mpvpaper-rs](https://github.com/BitYoungjae/mpvpaper-rs) by BitYoungjae
-- [swww](https://github.com/LBCrion/swww) by LBCrion
+- [swww](https://github.com/LGFae/swww) by LGFae
 - [mpv](https://mpv.io/) by mpv team
