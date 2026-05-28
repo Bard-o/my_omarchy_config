@@ -8,15 +8,17 @@ Omarchy comes out of the box with a polished, efficient desktop environment. But
 
 ## Contents
 
-### 🎬 Video Wallpapers
+### Video Wallpapers
 Animated wallpaper support for Omarchy using mpvpaper and swww.
 
 https://github.com/user-attachments/assets/bb87573b-edbd-456b-b81d-d50e9cd808fe
 
 [Learn more →](video-wallpaper/)
 
-### 📊 Waybar Custom
+### Waybar Custom
 A polished waybar setup with calendar TUI and multi-player media indicator. Right-click the clock for a month-view calendar made with Go, control any MPRIS player from the bar.
+
+https://github.com/user-attachments/assets/0dc6b8c0-9bc5-477b-b1cd-d4d9c95a19e7
 
 [Learn more →](waybar/)
 
