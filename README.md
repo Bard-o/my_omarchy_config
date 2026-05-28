@@ -15,6 +15,11 @@ https://github.com/user-attachments/assets/bb87573b-edbd-456b-b81d-d50e9cd808fe
 
 [Learn more →](video-wallpaper/)
 
+### 📊 Waybar Custom
+A polished waybar setup with calendar TUI and multi-player media indicator. Right-click the clock for a month-view calendar, control any MPRIS player from the bar.
+
+[Learn more →](waybar/)
+
 ## Credits
 
 Built with:

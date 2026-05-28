@@ -1,0 +1,20 @@
+package main
+
+import (
+	"fmt"
+	"os"
+
+	tea "github.com/charmbracelet/bubbletea"
+)
+
+func main() {
+	theme := LoadTheme()
+	model := NewModel(theme)
+
+	p := tea.NewProgram(model, tea.WithMouseCellMotion())
+
+	if _, err := p.Run(); err != nil {
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		os.Exit(1)
+	}
+}
