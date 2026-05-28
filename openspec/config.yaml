@@ -1,0 +1,60 @@
+# openspec/config.yaml
+schema: spec-driven
+
+context: |
+  Tech stack: Go 1.26.3, Bubbletea (TUI), Shell scripts
+  Architecture: Omarchy user-config collection; new component will be a standalone Go+Bubbletea TUI app (waybar-calendar/)
+  Testing: Go built-in test runner (go test); no project-level go.mod yet — will be initialized with new component
+  Style: Standard Go conventions (gofmt), Shell scripts
+
+rules:
+  proposal:
+    - Include rollback plan for risky changes
+  specs:
+    - Use Given/When/Then for scenarios
+    - Use RFC 2119 keywords (MUST, SHALL, SHOULD, MAY)
+  design:
+    - Include sequence diagrams for complex flows
+    - Document architecture decisions with rationale
+  tasks:
+    - Group by phase, use hierarchical numbering
+    - Keep tasks completable in one session
+  apply:
+    - Follow existing code patterns
+    tdd: true
+    test_command: "go test ./..."
+  verify:
+    test_command: "go test ./..."
+    build_command: "go build ./..."
+    coverage_threshold: 0
+  archive:
+    - Warn before merging destructive deltas
+
+testing:
+  strict_tdd: true
+  runner:
+    command: "go test ./..."
+    framework: "go test (built-in)"
+  layers:
+    unit:
+      available: true
+      tool: "go test"
+    integration:
+      available: false
+      tool: "—"
+    e2e:
+      available: false
+      tool: "—"
+  coverage:
+    available: true
+    command: "go test -cover ./... 2>&1 | tail -1"
+  quality:
+    linter:
+      available: false
+      tool: "—"
+    type_checker:
+      available: true
+      tool: "go vet"
+    formatter:
+      available: true
+      tool: "gofmt (or go fmt ./...)"
