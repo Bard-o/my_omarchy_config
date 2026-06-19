@@ -34,7 +34,7 @@ Built with:
 - [swww](https://github.com/LGFae/swww) - Animated GIF wallpaper
 - [mpv](https://mpv.io/) - Media player
 - [Hyprlock](https://wiki.hyprland.org/Hypr-Ecosystem/hyprlock) - Screen locking
-- [Walker](https://github.com/stepanzwolinski/log) - Menu system
+- [Walker](https://github.com/abenz1267/walker) - Menu system
 - [Omarchy](https://omarchy.org) - Base system
 
 ## License
