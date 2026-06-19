@@ -22,12 +22,19 @@ https://github.com/user-attachments/assets/0dc6b8c0-9bc5-477b-b1cd-d4d9c95a19e7
 
 [Learn more →](waybar/)
 
+### 🔐 Lock Screen
+A custom lock screen with circular avatar, username display, clock, date, and dark overlay. Includes an interactive avatar selector via the Elephant/Walker menu — choose your profile picture without editing config files.
+
+[Learn more →](lock-screen/)
+
 ## Credits
 
 Built with:
 - [mpvpaper-rs](https://github.com/BitYoungjae/mpvpaper-rs) - Video wallpaper player
 - [swww](https://github.com/LGFae/swww) - Animated GIF wallpaper
 - [mpv](https://mpv.io/) - Media player
+- [Hyprlock](https://wiki.hyprland.org/Hypr-Ecosystem/hyprlock) - Screen locking
+- [Walker](https://github.com/stepanzwolinski/log) - Menu system
 - [Omarchy](https://omarchy.org) - Base system
 
 ## License
