@@ -25,6 +25,8 @@ https://github.com/user-attachments/assets/0dc6b8c0-9bc5-477b-b1cd-d4d9c95a19e7
 ### 🔐 Lock Screen
 A custom lock screen with circular avatar, username display, clock, date, and dark overlay. Includes an interactive avatar selector via the Elephant/Walker menu — choose your profile picture without editing config files.
 
+https://github.com/user-attachments/assets/d5450712-2e80-499f-ab18-5abad73d488a
+
 [Learn more →](lock-screen/)
 
 ## Credits
