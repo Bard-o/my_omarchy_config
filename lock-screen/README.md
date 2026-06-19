@@ -68,6 +68,29 @@ font_size = 22
 
 For full documentation of all available options, see the [hyprlock wiki](https://wiki.hyprland.org/Hypr-Ecosystem/hyprlock).
 
+### Display Timeout After Lock
+
+By default, after locking the screen, the display turns off after **20 seconds** (this is an Omarchy system setting, not part of this config). This gives you time to appreciate your custom lock screen before it goes dark.
+
+To change this delay:
+
+```bash
+# Edit the system lock script
+nano ~/.local/share/omarchy/bin/omarchy-system-lock
+```
+
+Find this line near the bottom:
+
+```bash
+sleep 20
+```
+
+Change `20` to your preferred number of seconds (for example, `60` for one minute, or `0` to disable automatic display off entirely).
+
+After editing, save and you're done — no restart needed.
+
+> **Note:** This file is part of the Omarchy system and may be overwritten on updates. If that happens, simply edit it again.
+
 ## Files
 
 | File | Destination | Description |
